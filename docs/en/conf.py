@@ -18,7 +18,7 @@ import sys, os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "_themes"))
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), "_themes"))
 
 # -- General configuration -----------------------------------------------------
 
@@ -45,11 +45,11 @@ master_doc = 'index'
 project = u'Flask-Login'
 copyright = u'2011, Matthew Frazier'
 
-module_path = os.path.join(os.path.dirname(__file__), '..', 'flask_login')
+module_path = os.path.join(os.path.dirname(__file__), '..', '..', 'flask_login')
 module_path = os.path.abspath(module_path)
 
 about = {}
-with open(os.path.join(os.path.dirname(__file__), '..', 'flask_login', '__about__.py')) as f:
+with open(os.path.join(os.path.dirname(__file__), '..', '..', 'flask_login', '__about__.py')) as f:
     exec(f.read(), about)
 
 # The version info for the project you're documenting, acts as replacement for
@@ -108,7 +108,7 @@ html_theme = 'flask_small'
 html_theme_options = dict(github_fork='maxcountryman/flask-login', index_logo=False)
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = ['_themes']
+html_theme_path = [os.path.join('..', '_themes')]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -129,7 +129,7 @@ html_theme_path = ['_themes']
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = [os.path.join('..', '_static')]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
