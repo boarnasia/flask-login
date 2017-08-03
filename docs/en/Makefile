@@ -73,35 +73,35 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/CakePHPCookbook.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/Flask-Login.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/CakePHPCookbook.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/Flask-Login.qhc"
 
 devhelp:
 	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/CakePHPCookbook"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/CakePHPCookbook"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/Flask-Login"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/Flask-Login"
 	@echo "# devhelp"
 
 epub:
-	$(SPHINXBUILD) -b epub -D master_doc='epub-contents' $(ALLSPHINXOPTS) $(BUILDDIR)/epub/$(LANG)
+	$(SPHINXBUILD) -b epub $(ALLSPHINXOPTS) $(BUILDDIR)/epub/$(LANG)
 	@echo
 	@echo "Build finished. The epub file is in $(BUILDDIR)/epub/$(LANG)."
 
 latex:
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex/$(LANG)
 	@echo
-	@echo "Build finished; the LaTeX files are in $(BUILDDIR)/latex/$(LANG)."
+	@echo "Build finished; the LaTeX files are in $(BUILDDIR)/latex."
 	@echo "Run \`make' in that directory to run these through (pdf)latex" \
 	      "(use \`make latexpdf' here to do that automatically)."
 
 latexpdf:
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex/$(LANG)
 	@echo "Running LaTeX files through pdflatex..."
-	make -C $(BUILDDIR)/latex/$(LANG) all-pdf-ja
+	make -C $(BUILDDIR)/latex/$(LANG) all-pdf
 	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex/$(LANG)."
 
 text:
