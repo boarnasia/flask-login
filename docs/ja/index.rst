@@ -3,156 +3,141 @@ Flask-Login
 ===========
 .. currentmodule:: flask_login
 
-Flask-Login provides user session management for Flask. It handles the common
-tasks of logging in, logging out, and remembering your users' sessions over
-extended periods of time.
+Flask-Login は Flask にユーザーセッションマネージャーを提供します。
+これは、ログイン、ログアウト、そしてあなたのユーザーのセッションを長期間記憶するなどの一般的なタスクを管理します。
 
-It will:
+本機能は:
 
-- Store the active user's ID in the session, and let you log them in and out
-  easily.
-- Let you restrict views to logged-in (or logged-out) users.
-- Handle the normally-tricky "remember me" functionality.
-- Help protect your users' sessions from being stolen by cookie thieves.
-- Possibly integrate with Flask-Principal or other authorization extensions
-  later on.
+- アクティブユーザーのIDをセッションに保存し、ログイン・ログアウトを簡単にするでしょう。
+- ビューをログインした（またはログアウトした）ユーザーに制限するでしょう。
+- 一般的にトリッキーな "remember me" 機能を処理するでしょう。
+- ユーザーのセッションクッキーが悪意のある第三者に盗まれるのを防ぐのを助けるでしょう。
+- もしかしたら、Flask-Principal や他の認証拡張機能と後から統合することができるかもしれません。
 
-However, it does not:
+しかし:
 
-- Impose a particular database or other storage method on you. You are
-  entirely in charge of how the user is loaded.
-- Restrict you to using usernames and passwords, OpenIDs, or any other method
-  of authenticating.
-- Handle permissions beyond "logged in or not."
-- Handle user registration or account recovery.
+- 特定のデータベースまたは他のストレージメソッドを強制しません。あなたはユーザーデータの読み込みの全てを管理します。
+- ユーザー名とパスワード、OpenID、またはその他の認証方法を使用するように制限するものではありません。
+- "ログインしているかどうか"を超えた権限は処理しません。
+- ユーザー登録またはアカウントの回復を処理しません。
 
 .. contents::
    :local:
    :backlinks: none
 
 
-Installation
+インストール
 ============
-Install the extension with pip::
+pip で拡張をインストールする::
 
     $ pip install flask-login
 
-
-Configuring your Application
-============================
-The most important part of an application that uses Flask-Login is the
-`LoginManager` class. You should create one for your application somewhere in
-your code, like this::
+アプリケーションの設定
+======================
+Flask-Login を使用するアプリケーションの最も重要な部分は、 `LoginManager` クラスです。 これをアプリケーションのために、あなたのコードのどこかに作成する必要があります。このように::
 
     login_manager = LoginManager()
 
-The login manager contains the code that lets your application and Flask-Login
-work together, such as how to load a user from an ID, where to send users when
-they need to log in, and the like.
+ログインマネージャには、アプリケーションと Flask-Login を連携させるためのコードが含まれています。たとえば、ID からユーザーをロードする方法や、ユーザーがログインする必要があるときに送られる場所、そういった類の機能です。
 
-Once the actual application object has been created, you can configure it for
-login with::
+実際のアプリケーションオブジェクトが作成されたら、次のようにログイン用に設定できます::
 
     login_manager.init_app(app)
 
 
-How it Works
-============
-You will need to provide a `~LoginManager.user_loader` callback. This callback
-is used to reload the user object from the user ID stored in the session. It
-should take the `unicode` ID of a user, and return the corresponding user
-object. For example::
+使い方
+======
+`~LoginManager.user_loader` コールバックを提供する必要があります。
+このコールバックは、セッションに格納されているユーザーIDからユーザーオブジェクトをリロードするために使用されます。
+これはユーザの `unicode` IDを引数に取り、対応するユーザオブジェクトを返す必要があります。
+例えば::
 
     @login_manager.user_loader
     def load_user(user_id):
         return User.get(user_id)
 
-It should return `None` (**not raise an exception**) if the ID is not valid.
-(In that case, the ID will manually be removed from the session and processing
-will continue.)
+ID が有効でない場合、 `None` を返します（**例外は発生しません**）。
+（この場合、ID はセッションから手動で削除され、処理は続行されます）。
 
-Your User Class
-===============
-The class that you use to represent users needs to implement these properties
-and methods:
+ユーザークラス
+==============
+ユーザーを表すために使用するクラスは、これらのプロパティとメソッドを実装する必要があります:
 
 `is_authenticated`
-    This property should return `True` if the user is authenticated, i.e. they
-    have provided valid credentials. (Only authenticated users will fulfill
-    the criteria of `login_required`.)
+    このプロパティは、ユーザが認証されている場合、つまり有効な資格情報を持っている場合に `True` を返す必要があります。
+    （認証されたユーザだけが `login_required` の基準を満たします。）
 
 `is_active`
-    This property should return `True` if this is an active user - in addition
-    to being authenticated, they also have activated their account, not been
-    suspended, or any condition your application has for rejecting an account.
+    This property should return `True` if this is an active user - in addition to being authenticated, they also have activated their account, not been suspended, or any condition your application has for rejecting an account.
     Inactive accounts may not log in (without being forced of course).
 
+    Fix this translation::
+
+        このプロパティは、アクティブなユーザーであれば `True` を返さなければなりません -
+        認証されているだけでなく、アカウントが有効で、資格が停止れていない、またはいかなる状態、アプリケーションがもつ、アカウントを拒否するための。
+        非アクティブなアカウントはログインできません（もちろん強制されることはありません）。
+
 `is_anonymous`
-    This property should return `True` if this is an anonymous user. (Actual
-    users should return `False` instead.)
+    匿名ユーザーの場合、このプロパティは `True` を返す必要があります。
+    （実際のユーザーは代わりに `False` を返す必要があります）。
 
 `get_id()`
-    This method must return a `unicode` that uniquely identifies this user,
-    and can be used to load the user from the `~LoginManager.user_loader`
-    callback. Note that this **must** be a `unicode` - if the ID is natively
-    an `int` or some other type, you will need to convert it to `unicode`.
+    このメソッドは、このユーザーを一意に識別する `unicode` を返し、
+    `~LoginManager.user_loader` コールバックからユーザーをロードするために使用できなければなりません。
+    これは `unicode` **でなければならない** ことに注意してください -
+    ID がネイティブの `int` またはその他のタイプの場合は、 `unicode` に変換する必要があります。
 
-To make implementing a user class easier, you can inherit from `UserMixin`,
-which provides default implementations for all of these properties and methods.
-(It's not required, though.)
+ユーザークラスの実装を容易にするために、 `UserMixin` を継承することができます。これは、これらすべてのプロパティとメソッドのデフォルトの実装を提供します。
+（ただし、必須ではありません。）
 
-Login Example
-=============
+ログインの例
+============
 
-Once a user has authenticated, you log them in with the `login_user`
-function.
+ユーザーが認証されたなら、 `login_user` 関数でユーザーをログインさせます。
 
-    For example:
+    例:
 
 .. code-block:: python
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
-        # Here we use a class of some kind to represent and validate our
-        # client-side form data. For example, WTForms is a library that will
-        # handle this for us, and we use a custom LoginForm to validate.
+        # ここでは、クライアントサイドのフォームデータを表現して検証するために、ある種のクラスを使用します。
+        # たとえば、WTForms はこれを処理するライブラリで、カスタム LoginForm を使用して検証します。
         form = LoginForm()
         if form.validate_on_submit():
-            # Login and validate the user.
-            # user should be an instance of your `User` class
+            # ログインとユーザの認証。
+            # user は `User` クラスのインスタンスでなければいけません。
             login_user(user)
 
             flask.flash('Logged in successfully.')
 
             next = flask.request.args.get('next')
-            # is_safe_url should check if the url is safe for redirects.
-            # See http://flask.pocoo.org/snippets/62/ for an example.
+            # is_safe_url は url がリダイレクトに対し安全であるかを確認すべきです。
+            # 参考までに http://flask.pocoo.org/snippets/62/
             if not is_safe_url(next):
                 return flask.abort(400)
 
             return flask.redirect(next or flask.url_for('index'))
         return flask.render_template('login.html', form=form)
 
-*Warning:* You MUST validate the value of the `next` parameter. If you do not,
-your application will be vulnerable to open redirects. For an example
-implementation of `is_safe_url` see `this Flask Snippet`_.
+*警告:* あなたは `next` パラメータの値を検証しなければなりません。
+そうしないと、アプリケーションはオープンリダイレクトに対して脆弱になります。
+`is_safe_url` の実装例については `この Flask Snippet`_ を参照してください。
 
-It's that simple. You can then access the logged-in user with the
-`current_user` proxy, which is available in every template::
+`current_user` プロキシを使用して、簡単にログインしているユーザにアクセスできます。これは、すべてのテンプレートで利用可能です::
 
     {% if current_user.is_authenticated %}
       Hi {{ current_user.name }}!
     {% endif %}
 
-Views that require your users to be logged in can be
-decorated with the `login_required` decorator::
+ユーザがログインしている必要があるビューは `login_required` デコレータで装飾することができます::
 
     @app.route("/settings")
     @login_required
     def settings():
         pass
 
-When the user is ready to log out::
+ユーザーがログアウトする準備ができたら::
 
     @app.route("/logout")
     @login_required
@@ -160,12 +145,12 @@ When the user is ready to log out::
         logout_user()
         return redirect(somewhere)
 
-They will be logged out, and any cookies for their session will be cleaned up.
+ログアウトした後、セッションで使われたクッキーはクリーンアップされます。
 
 
 
-Customizing the Login Process
-=============================
+ログインプロセスのカスタマイズ
+==============================
 By default, when a user attempts to access a `login_required` view without
 being logged in, Flask-Login will flash a message and redirect them to the
 log in view. (If the login view is not set, it will abort with a 401 error.)
@@ -588,4 +573,4 @@ signals in your code.
    the app.
 
 .. _Flask documentation on signals: http://flask.pocoo.org/docs/signals/
-.. _this Flask Snippet: http://flask.pocoo.org/snippets/62/
+.. _この Flask Snippet: http://flask.pocoo.org/snippets/62/
