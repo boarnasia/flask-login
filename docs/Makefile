@@ -19,7 +19,7 @@ SPHINX_DEPENDENCIES = $(foreach lang, $(LANGS), $(lang)/Makefile)
 
 # Copy-paste the English Makefile everywhere it's needed (if non existing).
 %/Makefile: en/Makefile
-	cp -n $< $@
+	-cp -n $< $@
 
 #
 # The various formats the documentation can be created in.
